@@ -46,6 +46,37 @@ class UDI(CP4S):
         logger.warning(f"Failed to post UDI query: status_code={r.status_code}")
         return None
 
+    def get_udi_query_status(self, query_id):
+        r = self.session.get(f"{self.base_url}/queries/{query_id}")
+        if r.status_code == 200:
+            logger.debug(f"UDI query status: {r.json()}")
+            return r.json()
+
+        logger.warning(
+            f"UDI retrieve query status failed: (status_code={r.status_code})"
+        )
+        return None
+
+    def get_udi_query_result(self, query_id, page_id):
+        r = self.session.get(
+            f"{self.base_url}/queries/{query_id}/results/{page_id}",
+            timeout=10,
+        )
+        if r.status_code == 200:
+            return r.json()
+
+        logger.warning(f"UDI retrieve query result failed: status_code={r.status_code}")
+        return None
+
+    def cancel_udi_query(self, query_id):
+        r = self.session.post(
+            f"{self.base_url}/queries/{query_id}/cancel",
+        )
+        if r.status_code == 200:
+            return True
+        logger.warning(f"UDI cancel query failed: status_code={r.status_code}")
+        return False
+
     @staticmethod
     def _escape_query(query: str) -> str:
         if isinstance(query, str):
