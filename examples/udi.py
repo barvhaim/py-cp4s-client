@@ -16,8 +16,12 @@ def main():
         skip_ssl_verify=True
     )
 
-    configs = udi.get_udi_configurations()
-    print(configs)
+    query_resp = udi.post_udi_query(
+        query="[ipv4-addr:value = '10.45.1.1']",
+        configuration_ids=['8c6931e8-cd60-4379-b34c-9f65030a7f33']
+    )
+
+    print(query_resp)
 
 
 if __name__ == "__main__":

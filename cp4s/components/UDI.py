@@ -25,3 +25,30 @@ class UDI(CP4S):
                      f"error code = {r.status_code}")
         return None
 
+    def get_udi_connections(self) -> Optional[Dict]:
+        r = self.session.get(f"{self.base_url}/connections")
+        if r.status_code == 200:
+            return r.json()
+
+        logger.error(f"Failed to retrieve UDI connections. "
+                     f"error code = {r.status_code}")
+        return None
+
+    def post_udi_query(self, query, configuration_ids=None) -> Optional[Dict]:
+        r = self.session.post(f"{self.base_url}/queries", json={
+            "query": UDI._escape_query(query),
+            "configuration_ids": ",".join(configuration_ids or []),
+        })
+        if r.status_code == 201:
+            logger.info(f"UDI query posted successfully: '{query}'")
+            return r.json()
+
+        logger.warning(f"Failed to post UDI query: status_code={r.status_code}")
+        return None
+
+    @staticmethod
+    def _escape_query(query: str) -> str:
+        if isinstance(query, str):
+            if "\\" in query:
+                query = query.replace("\\", "\\\\")
+        return query
